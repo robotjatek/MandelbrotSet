@@ -107,11 +107,11 @@ int main(int argc, char* argv[])
 		}
 		static unsigned int i = 1;
 		//std::cout << i << "\n";
-		if (i > 28)
+		if (i < 28)
 		{
-			i = 28;
+			InitScreen(i++);
 		}
-		InitScreen(i++);
+		
 		SDL_UpdateTexture(screentex, nullptr, screen, SCREEN_SIZE_X * 3);
 		SDL_RenderClear(renderer);
 		SDL_RenderCopy(renderer, screentex, nullptr, nullptr);
