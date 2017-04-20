@@ -21,5 +21,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="vertex.vert">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="fs.frag">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
