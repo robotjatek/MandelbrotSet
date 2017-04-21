@@ -15,6 +15,8 @@
 
 #define SCREEN_SIZE_X 1280
 #define SCREEN_SIZE_Y 720
+#define MOVE_SPEED 0.02
+
 /*struct Color
 {
 uint8_t r, g, b;
@@ -29,9 +31,9 @@ SDL_Texture* screentex;
 SDL_Event s_event;
 SDL_GLContext context;
 
-float zoomfactor = 1.0f;
-float centerx = 0.0f;
-float centery = 0.0f;
+double zoomfactor = 1.0f;
+double centerx = 0.0f;
+double centery = 0.0f;
 int iterations = 28;
 
 bool InsideMandelbrot(const std::complex<double>& Z)
@@ -92,29 +94,29 @@ void HandleKeys(SDL_Event& ev, bool& exit)
 		
 		if (ev.key.keysym.sym == SDLK_KP_PLUS)
 		{
-			zoomfactor -= (0.005f*zoomfactor);
+			zoomfactor -= (MOVE_SPEED * zoomfactor);
 		}
 		else if (ev.key.keysym.sym == SDLK_KP_MINUS)
 		{
-			zoomfactor += (0.005f*zoomfactor);
+			zoomfactor += (MOVE_SPEED * zoomfactor);
 		}
 		
 		if (ev.key.keysym.sym == SDLK_w)
 		{
-			centery += (0.005f*zoomfactor);
+			centery += (MOVE_SPEED * zoomfactor);
 		}
 		else if (ev.key.keysym.sym == SDLK_s)
 		{
-			centery -= (0.005f*zoomfactor);
+			centery -= (MOVE_SPEED * zoomfactor);
 		}
 		
 		if (ev.key.keysym.sym == SDLK_d)
 		{
-			centerx += (0.005f*zoomfactor);
+			centerx += (MOVE_SPEED * zoomfactor);
 		}
 		else if (ev.key.keysym.sym == SDLK_a)
 		{
-			centerx -= (0.005f*zoomfactor);
+			centerx -= (MOVE_SPEED * zoomfactor);
 		}
 
 		if (ev.key.keysym.sym == SDLK_q)
@@ -335,11 +337,11 @@ void MandelbrotGPU()
 		GLuint wndyuni = glGetUniformLocation(programID, "WINDOW_SIZE_Y");
 		glUniform1i(wndyuni, SCREEN_SIZE_Y);
 		GLuint zoomuni = glGetUniformLocation(programID, "zoomfactor");
-		glUniform1f(zoomuni, zoomfactor);
+		glUniform1d(zoomuni, zoomfactor);
 		GLuint centeryuni = glGetUniformLocation(programID, "centery");
-		glUniform1f(centeryuni, centery);
+		glUniform1d(centeryuni, centery);
 		GLuint centerxuni = glGetUniformLocation(programID, "centerx");
-		glUniform1f(centerxuni, centerx);
+		glUniform1d(centerxuni, centerx);
 		GLuint userit = glGetUniformLocation(programID, "useriterations");
 		glUniform1i(userit, iterations);
 
