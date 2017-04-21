@@ -363,6 +363,10 @@ void MandelbrotGPU()
 
 		SDL_GL_SwapWindow(wnd);
 	}
+
+	glDeleteVertexArrays(1, &VertexArrayID);
+	glDeleteBuffers(1, &vertexbuffer);
+	glDeleteProgram(programID);
 	
 	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(wnd);
