@@ -5,6 +5,7 @@
 #include <fstream>
 
 #include <glm\glm.hpp>
+#include <glm\gtc\matrix_transform.hpp>
 #include <GL\glew.h>
 #include <SDL.h>
 
@@ -30,6 +31,13 @@ SDL_Renderer* renderer;
 SDL_Texture* screentex;
 SDL_Event s_event;
 SDL_GLContext context;
+unsigned int WINDOW_WIDTH = SCREEN_SIZE_X;
+unsigned int WINDOW_HEIGHT = SCREEN_SIZE_Y;
+
+glm::mat4 modelmat = glm::mat4(1);
+glm::mat4 viewmat = glm::mat4(1);
+glm::mat4 projmat = glm::ortho(-1, 1, -1, 1);
+glm::mat4 MVP = projmat*viewmat*modelmat;
 
 double zoomfactor = 1.0f;
 double centerx = 0.0f;
@@ -140,6 +148,17 @@ void HandleKeys(SDL_Event& ev, bool& exit)
 			iterations = 0;
 		}
 
+	}
+	else if (ev.type == SDL_WINDOWEVENT)
+	{
+		if (ev.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+		{
+			WINDOW_WIDTH = ev.window.data1;
+			WINDOW_HEIGHT = ev.window.data2;
+			glViewport(0, 0, ev.window.data1, ev.window.data2);
+			projmat = glm::ortho(-1, 1, -1, 1);
+			MVP = projmat*viewmat* modelmat;
+		}
 	}
 }
 
@@ -306,13 +325,9 @@ void MandelbrotGPU()
 
 	glClearColor(1.0f, 0, 0, 0);
 
-	// This will identify our vertex buffer
 	GLuint vertexbuffer;
-	// Generate 1 buffer, put the resulting identifier in vertexbuffer
 	glGenBuffers(1, &vertexbuffer);
-	// The following commands will talk about our 'vertexbuffer' buffer
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	// Give our vertices to OpenGL.
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
 	GLuint programID = LoadShaders("vertex.vert", "fs.frag");
@@ -333,9 +348,9 @@ void MandelbrotGPU()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		GLuint wndxuni = glGetUniformLocation(programID, "WINDOW_SIZE_X");
-		glUniform1i(wndxuni, SCREEN_SIZE_X);
+		glUniform1i(wndxuni, WINDOW_WIDTH);
 		GLuint wndyuni = glGetUniformLocation(programID, "WINDOW_SIZE_Y");
-		glUniform1i(wndyuni, SCREEN_SIZE_Y);
+		glUniform1i(wndyuni, WINDOW_HEIGHT);
 		GLuint zoomuni = glGetUniformLocation(programID, "zoomfactor");
 		glUniform1d(zoomuni, zoomfactor);
 		GLuint centeryuni = glGetUniformLocation(programID, "centery");
@@ -344,22 +359,15 @@ void MandelbrotGPU()
 		glUniform1d(centerxuni, centerx);
 		GLuint userit = glGetUniformLocation(programID, "useriterations");
 		glUniform1i(userit, iterations);
+		GLuint mvpid = glGetUniformLocation(programID, "MVP");
+		glUniformMatrix4fv(mvpid, 1, GL_FALSE, &MVP[0][0]);
 
 		glUseProgram(programID);
 
-		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glVertexAttribPointer(
-			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			0,                  // stride
-			(void*)0            // array buffer offset
-		);
-		// Draw the triangle !
-		glDrawArrays(GL_TRIANGLES, 0, 6); // Starting from vertex 0; 3 vertices total -> 1 triangle
+		glVertexAttribPointer(0,3,GL_FLOAT,	GL_FALSE,0,(void*)0);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glDisableVertexAttribArray(0);
 
 
