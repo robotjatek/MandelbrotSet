@@ -10,6 +10,12 @@
 #include <SDL.h>
 
 #ifdef _WIN32
+#include <Windows.h>
+
+extern "C" {
+	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+}
+
 #pragma comment(lib, "SDL2.lib")
 #pragma comment(lib, "SDL2main.lib")
 #endif
@@ -303,14 +309,17 @@ GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_pat
 void MandelbrotGPU()
 {
 	SDL_Init(SDL_INIT_VIDEO);
-	wnd = SDL_CreateWindow("Mandelbrot GPU", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_SIZE_X, SCREEN_SIZE_Y, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	wnd = SDL_CreateWindow("Mandelbrot GPU", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_SIZE_X, SCREEN_SIZE_Y, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 	context = SDL_GL_CreateContext(wnd);
+	printf("%d\n", SDL_GL_SetSwapInterval(0));
 	glewExperimental = GL_TRUE;
 	glewInit();
+
+	printf("%s\n",glGetString(GL_RENDERER));
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
