@@ -9,3 +9,5 @@ E - Increase iterarion number
 "Numpad +" - Zoom in
 "Numpad -" - Zoom out
 Esc - Quit
+
+[![Mandelbrot fractal renderer](http://img.youtube.com/vi/EIJSVk6_osw/0.jpg)](http://www.youtube.com/watch?v=EIJSVk6_osw)
